@@ -10,13 +10,14 @@
         @foreach(var pokemon in pokemonList)
         {
             <div class="pokemon-card">
-               <img src = "@pokemon.sprites.front_default" alt="Pokemon Sprite">
-               <h4 class="pokemon-name">@pokemon.name</h4>
-               <div class="type-row">
-                   @foreach (var type in pokemon.types)
-                   {
-                       <span>@type.type.name</span>
-                   }
+                <img src = "@pokemon.sprites.front_default" alt="Pokemon Sprite">
+                <h4 class="pokemon-name">@pokemon.name</h4>
+                <div class="type-row">
+                    @foreach (var type in pokemon.types)
+                    {
+                        <span>@type.type.name</span>
+                        
+                    }
                 </div>
             </div>
         }
@@ -35,6 +36,7 @@ Welcome to your new app.
         {
             pokemonList.Add(await client.GetPokemonById(i.ToString()));
             StateHasChanged();
-       }
+
+        }
     }
 }
