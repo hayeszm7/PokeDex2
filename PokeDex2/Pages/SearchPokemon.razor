@@ -1,0 +1,60 @@
+﻿@page "/SearchPokemon"
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+@using Models
+@using API
+
+<h1>Pokemon Search</h1>
+
+<div class="form-group">
+    <label for="pokemonName">Pokemon Name:</label>
+    <input type="text" id="pokemonName" class="form-control" @bind="pokemonName" />
+</div>
+
+<button class="btn btn-primary" @onclick="PokemonSearch">Search</button>
+@if (pokemon != null)
+{
+    <h2>@pokemon.name</h2>
+    <img src="@pokemon.sprites.front_default" alt="@pokemon.name" />
+    <p>Height: @pokemon.height</p>
+    <p>Weight: @pokemon.weight</p>
+    <h3>Types:</h3>
+    <ul>
+        @foreach (var type in pokemon.types)
+        {
+            <li>@type.type.name</li>
+        }
+    </ul>
+
+
+<Component />
+@code {
+    private string pokemonName;
+    private Pokemon pokemon;
+    private bool searchAttempted = false;
+
+    private async Task PokemonSearch()
+    {
+        searchAttempted = true;
+        pokemon = null; //reset pokemon
+        try
+        {
+            var response = await Http.GetAsync($"https://pokeapi.co/api/v2/pokemon/{pokemonName.ToLower()}");
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                pokemon = System.Text.Json.JsonSerializer.Deserialize<Pokemon>(content, new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+            else
+            {
+                pokemon = null; // Pokemon not found
+            }
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("console.error", $"Error searching Pokemon: {ex.Message}");
+            pokemon = null; // Error occurred, treat as not found.
+        }
+    }
+    }
+    }
