@@ -15,7 +15,7 @@ namespace PokeDex2.Models
             public Sprites sprites { get; set; }
             public List<Stat> stats { get; set; }
             public List<Type> types { get; set; }
-           
-        
+           public List<Ability> abilities { get; set; }
+
     }
 }

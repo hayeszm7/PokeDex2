@@ -1,0 +1,32 @@
+﻿@page "/FavoritePokemon"
+@using PokeDex2.Services
+@using PokeDex2.Models
+@inject FavoritePokemonService FavoriteService
+<h3>Favorite Pokemon</h3>
+
+@if (favorites == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (favorites.Count == 0)
+{
+    <p>No favorite Pokemon yet.</p>
+}
+else
+{
+    <ul>
+        @foreach (var favorite in favorites)
+        {
+            <li>@favorite.PokemonName</li>
+        }
+    </ul>
+}
+
+@code {
+    private List<PokeDex2.Models.FavoritePokemon> favorites;
+
+    protected override async Task OnInitializedAsync()
+    {
+        favorites = await FavoriteService.GetFavoritePokemons();
+    }
+}

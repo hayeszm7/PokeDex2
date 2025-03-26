@@ -8,22 +8,12 @@
     public class PokemonDbContext : DbContext
     {
         public DbSet<Pokemon> Pokemon { get; set; }
-        
+        public DbSet<FavoritePokemon> FavoritePokemons { get; set; }
 
-        public string DbPath { get; }
-
-        public PokemonDbContext()
+        public PokemonDbContext(DbContextOptions<PokemonDbContext> options) : base(options)
         {
-            var folder = Environment.SpecialFolder.LocalApplicationData;
-            var path = Environment.GetFolderPath(folder);
-            DbPath = System.IO.Path.Join(path, "pokemon.db");
         }
 
-        // The following configures EF to create a Sqlite database file in the
-        // special "local" folder for your platform.
-        protected override void OnConfiguring(DbContextOptionsBuilder options)
-            => options.UseSqlite($"Data Source={DbPath}");
-    }
 
-   
+    }
 }
