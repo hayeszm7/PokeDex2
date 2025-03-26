@@ -3,40 +3,99 @@
 @using API
 @inject ApiClient client
 
-<PageTitle>AllPokemon</PageTitle>
+<PageTitle>All Pokemon</PageTitle>
 
-.<div class="container">
-    <div class="pokemon-row">
-        @foreach (var pokemon in pokemonList)
-        {
-            <div class="pokemon-card">
-                <img src="@pokemon.sprites.front_default" alt="Pokemon Sprite">
-                <h4 class="pokemon-name">@pokemon.name</h4>
-                <div class="type-row">
-                    @foreach (var type in pokemon.types)
-                    {
-                        <span>@type.type.name</span>
+<div class="container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Sprite</th>
+                <th>Name</th>
+                <th>Types</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var pokemon in pokemonList)
+            {
+                <tr>
+                    <td><img src="@pokemon.sprites.front_default" alt="@pokemon.name Sprite" style="max-width: 50px; max-height: 50px;" /></td>
+                    <td><a href="javascript:void(0);" @onclick="() => ShowPokemonDetails(pokemon.id)" style="text-decoration: underline; color: blue;">@pokemon.name</a></td>
+                    <td>
+                        @foreach (var type in pokemon.types)
+                        {
+                            <span>@type.type.name</span>
+                            @if (pokemon.types.IndexOf(type) < pokemon.types.Count - 1)
+                            {
+                                <span>, </span>
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 
-                    }
+    @if (selectedPokemon != null)
+    {
+        <div class="modal" style="display: block; background-color: rgba(0, 0, 0, 0.5);">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">@selectedPokemon.name</h5>
+                        <button type="button" class="close" @onclick="() => selectedPokemon = null">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <img src="@selectedPokemon.sprites.front_default" alt="@selectedPokemon.name" />
+                        <p>Height: @selectedPokemon.height</p>
+                        <p>Weight: @selectedPokemon.weight</p>
+
+                        <h3>Types:</h3>
+                        <ul>
+                            @foreach (var type in selectedPokemon.types)
+                            {
+                                <li>@type.type.name</li>
+                            }
+                        </ul>
+                        <h3>Stats:</h3>
+                        <ul>
+                            @foreach (var stat in selectedPokemon.stats)
+                            {
+                                <li>@stat.stat.name: @stat.base_stat</li>
+                            }
+                        </ul>
+
+                        <h3>Abilities:</h3>
+                        <ul>
+                            @foreach (var ability in selectedPokemon.abilities)
+                            {
+                                <li>@ability.ability.name</li>
+                            }
+                        </ul>
+                    </div>
                 </div>
             </div>
-        }
-    </div>
-
+        </div>
+    }
 </div>
-
-
 
 @code {
     Pokemon pokemon = new Pokemon();
     List<Pokemon> pokemonList = new List<Pokemon>();
+    Pokemon selectedPokemon;
+
     protected override async Task OnInitializedAsync()
     {
         for (int i = 1; i < 1302; i++)
         {
             pokemonList.Add(await client.GetPokemonById(i.ToString()));
             StateHasChanged();
-
         }
+    }
+
+    private async Task ShowPokemonDetails(int pokemonId)
+    {
+        selectedPokemon = await client.GetPokemonById(pokemonId.ToString());
     }
 }
