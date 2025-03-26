@@ -1,8 +1,10 @@
 ﻿@page "/SearchPokemon"
 @inject HttpClient Http
 @inject IJSRuntime JSRuntime
+@inject FavoritePokemonService FavoriteService // Inject your service
 @using Models
 @using API
+@using PokeDex2.Services
 
 <h1>Pokemon Search</h1>
 
@@ -12,12 +14,14 @@
 </div>
 
 <button class="btn btn-primary" @onclick="PokemonSearch">Search</button>
+
 @if (pokemon != null)
 {
     <h2>@pokemon.name</h2>
     <img src="@pokemon.sprites.front_default" alt="@pokemon.name" />
     <p>Height: @pokemon.height</p>
     <p>Weight: @pokemon.weight</p>
+
     <h3>Types:</h3>
     <ul>
         @foreach (var type in pokemon.types)
@@ -25,9 +29,29 @@
             <li>@type.type.name</li>
         }
     </ul>
+    <h3>Stats:</h3>
+    <ul>
+        @foreach (var stat in pokemon.stats)
+        {
+            <li>@stat.stat.name: @stat.base_stat</li>
+        }
+    </ul>
 
+    <h3>Abilities:</h3>
+    <ul>
+        @foreach (var ability in pokemon.abilities)
+        {
+            <li>@ability.ability.name</li>
+        }
+    </ul>
 
-<Component />
+    <button class="btn btn-success" @onclick="AddToFavorites">Add to Favorites</button>
+}
+else if (searchAttempted)
+{
+    <p>Pokemon not found, please check for spelling errors.</p>
+}
+
 @code {
     private string pokemonName;
     private Pokemon pokemon;
@@ -56,5 +80,23 @@
             pokemon = null; // Error occurred, treat as not found.
         }
     }
+
+    private async Task AddToFavorites()
+    {
+        if (pokemon != null)
+        {
+            // Assuming you have a way to get the Pokemon's ID (e.g., from the API response)
+            // You can use the pokemon.id property if it exists in your Pokemon model.
+            // If not, you might need to fetch the Pokemon from your local DB if you are caching them.
+            var success = await FavoriteService.AddToFavorites(pokemon.id); // Assuming Pokemon ID is available.
+            if (success)
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Pokemon added to favorites!");
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Failed to add Pokemon to favorites.");
+            }
+        }
     }
-    }
+}
