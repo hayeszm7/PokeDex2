@@ -87,15 +87,34 @@
 
     protected override async Task OnInitializedAsync()
     {
-        for (int i = 1; i < 1302; i++)
+        for (int i = 1; i < 10278; i++)
         {
-            pokemonList.Add(await client.GetPokemonById(i.ToString()));
+            if (i >= 1025 && i < 10001)
+            {
+                continue; // Skip IDs from 1025 to 10000 (inclusive)
+            }
+            try
+            {
+                pokemonList.Add(await client.GetPokemonById(i.ToString()));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching Pokemon ID {i}: {ex.Message}");
+                //Handle the error appropriately. You can add a default pokemon or skip adding the current pokemon.
+            }
             StateHasChanged();
         }
     }
 
     private async Task ShowPokemonDetails(int pokemonId)
     {
-        selectedPokemon = await client.GetPokemonById(pokemonId.ToString());
+        try
+        {
+            selectedPokemon = await client.GetPokemonById(pokemonId.ToString());
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching Pokemon ID {pokemonId}: {ex.Message}");
+        }
     }
 }
